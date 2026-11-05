@@ -85,4 +85,16 @@ class OwnerControllerTest {
                 .content(jsonWithoutLastName))
                 .andExpect(status().isBadRequest());
     }
+
+    // Prueba 3: testFindByLastName — GET /owners?lastName=Davis -> 2 resultados
+    @Test
+    void testFindByLastName() throws Exception {
+        mockMvc.perform(get("/owners").param("lastName", "Davis"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].lastName").value("Davis"))
+                .andExpect(jsonPath("$[1].lastName").value("Davis"));
+    }
 }

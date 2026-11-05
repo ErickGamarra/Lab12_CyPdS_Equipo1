@@ -87,7 +87,7 @@ class OwnerControllerMockitoTest {
                 .andExpect(jsonPath("$.telephone").value("987654321"));
     }
 
-    // Prueba 2: testCreateOwner_BadRequest — cuerpo inválido (sin lastName) -> 400 Bad Request
+     // Prueba 2: testCreateOwner_BadRequest — cuerpo inválido (sin lastName) -> 400 Bad Request
     @Test
     void testCreateOwner_BadRequest() throws Exception {
         String jsonWithoutLastName = """
@@ -103,5 +103,22 @@ class OwnerControllerMockitoTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonWithoutLastName))
                 .andExpect(status().isBadRequest());
+    }
+
+    // Prueba 3: testFindByLastName — GET /owners?lastName=Davis -> 2 resultados
+    @Test
+    void testFindByLastName() throws Exception {
+        when(service.findByLastName("Davis")).thenReturn(List.of(
+                OwnerTestData.owner(2L, "Betty", "Davis", "638 Cardinal Ave.", "Sun Prairie", "6085551749"),
+                OwnerTestData.owner(4L, "Harold", "Davis", "563 Friendly St.", "Windsor", "6085553198")
+        ));
+
+        mockMvc.perform(get("/owners").param("lastName", "Davis"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].lastName").value("Davis"))
+                .andExpect(jsonPath("$[1].lastName").value("Davis"));
     }
 }

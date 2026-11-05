@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class   OwnerControllerMockitoTest {
+class OwnerControllerMockitoTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -85,5 +85,23 @@ class   OwnerControllerMockitoTest {
                 .andExpect(jsonPath("$.address").value("Av. Principal 123"))
                 .andExpect(jsonPath("$.city").value("Lima"))
                 .andExpect(jsonPath("$.telephone").value("987654321"));
+    }
+
+    // Prueba 2: testCreateOwner_BadRequest — cuerpo inválido (sin lastName) -> 400 Bad Request
+    @Test
+    void testCreateOwner_BadRequest() throws Exception {
+        String jsonWithoutLastName = """
+            {
+                "firstName": "Carlos",
+                "address": "Av. Principal 123",
+                "city": "Lima",
+                "telephone": "987654321"
+            }
+            """;
+
+        mockMvc.perform(post("/owners")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonWithoutLastName))
+                .andExpect(status().isBadRequest());
     }
 }

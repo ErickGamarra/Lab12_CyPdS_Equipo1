@@ -12,4 +12,15 @@ public final class OwnerTestData {
         owner.setLastName(lastName);
         return owner;
     }
+
+    public static Owner owner(long id, String firstName, String lastName, String address, String city, String telephone) {
+        Owner owner = new Owner();
+        owner.setId(id);
+        owner.setFirstName(firstName);
+        owner.setLastName(lastName);
+        owner.setAddress(address);
+        owner.setCity(city);
+        owner.setTelephone(telephone);
+        return owner;
+    }
 }

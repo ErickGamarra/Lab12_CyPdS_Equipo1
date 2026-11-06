@@ -16,9 +16,13 @@ import java.util.Optional;
 
 import static com.tecsup.petclinic.util.OwnerTestData.owner;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -120,5 +124,54 @@ class OwnerControllerMockitoTest {
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].lastName").value("Davis"))
                 .andExpect(jsonPath("$[1].lastName").value("Davis"));
+    }
+
+    // Integrante C — Actualización y borrado
+    // Prueba 1: testUpdateOwner — PUT /owners/{id} -> 200 OK con el dueño actualizado
+    @Test
+    void testUpdateOwner() throws Exception {
+        Owner updated = OwnerTestData.owner(7L, "Mario", "Paredes Soto", "Av. Ejercito 900", "Cusco", "955000111");
+        when(service.update(eq(7L), any(Owner.class))).thenReturn(Optional.of(updated));
+
+        String updatedJson = """
+            {
+                "firstName": "Mario",
+                "lastName": "Paredes Soto",
+                "address": "Av. Ejercito 900",
+                "city": "Cusco",
+                "telephone": "955000111"
+            }
+            """;
+
+        mockMvc.perform(put("/owners/7")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updatedJson))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(7))
+                .andExpect(jsonPath("$.lastName").value("Paredes Soto"))
+                .andExpect(jsonPath("$.city").value("Cusco"));
+
+        verify(service).update(eq(7L), any(Owner.class));
+    }
+
+    // Prueba 2: testDeleteOwner — DELETE /owners/{id} -> 200 OK
+    @Test
+    void testDeleteOwner() throws Exception {
+        when(service.delete(7L)).thenReturn(true);
+
+        mockMvc.perform(delete("/owners/7"))
+                .andExpect(status().isOk());
+
+        verify(service).delete(7L);
+    }
+
+    // Prueba 3: testDeleteOwnerKO — DELETE /owners/1000 -> 404 Not Found
+    @Test
+    void testDeleteOwnerKO() throws Exception {
+        when(service.delete(1000L)).thenReturn(false);
+
+        mockMvc.perform(delete("/owners/1000"))
+                .andExpect(status().isNotFound());
     }
 }

@@ -36,4 +36,17 @@ public class OwnerController {
         Owner created = service.create(owner);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Owner> update(@PathVariable Long id, @RequestBody Owner owner) {
+        return ResponseEntity.of(service.update(id, owner));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        if (!service.delete(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok().build();
+    }
 }

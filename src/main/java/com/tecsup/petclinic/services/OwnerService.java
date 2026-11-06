@@ -29,4 +29,23 @@ public class OwnerService {
     public List<Owner> findByLastName(String lastName) {
         return repository.findByLastName(lastName);
     }
+
+    public Optional<Owner> update(Long id, Owner owner) {
+        return repository.findById(id).map(existing -> {
+            existing.setFirstName(owner.getFirstName());
+            existing.setLastName(owner.getLastName());
+            existing.setAddress(owner.getAddress());
+            existing.setCity(owner.getCity());
+            existing.setTelephone(owner.getTelephone());
+            return repository.save(existing);
+        });
+    }
+
+    public boolean delete(Long id) {
+        if (!repository.existsById(id)) {
+            return false;
+        }
+        repository.deleteById(id);
+        return true;
+    }
 }

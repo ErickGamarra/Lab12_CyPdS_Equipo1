@@ -29,3 +29,22 @@ Con Java 21, desde la terminal de IntelliJ en Windows:
 
 El perfil predeterminado es H2 en memoria. El puerto predeterminado es 8080.
 Durante la preparación de esta rama individual no se produjeron conflictos.
+
+## Laboratorio 12 · Actualización y borrado de dueños
+
+Erick Gamarra (integrante C) implementó el bloque de actualización y borrado en
+`Lab12-IntegranteC-Gamarra`, partiendo de la base de OwnerController integrada
+de los bloques A y B. Cada escenario se ejecuta en `OwnerControllerTest` contra
+H2 y en `OwnerControllerMockitoTest` con el servicio simulado.
+
+| Prueba | Petición | Resultado esperado |
+| --- | --- | --- |
+| `testUpdateOwner` | `POST /owners` + `PUT /owners/{id}` | 200 y `GET` confirma el cambio |
+| `testDeleteOwner` | `POST /owners` + `DELETE /owners/{id}` | 200 y el dueño ya no existe |
+| `testDeleteOwnerKO` | `DELETE /owners/1000` | 404 |
+
+Con Java 21, desde la terminal de IntelliJ en Windows:
+
+```powershell
+.\mvnw.cmd test "-Dtest=OwnerControllerTest,OwnerControllerMockitoTest" "-Dspring.profiles.active=h2"
+```

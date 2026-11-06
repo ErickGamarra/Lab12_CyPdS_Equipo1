@@ -1,21 +1,24 @@
 package com.tecsup.petclinic.webs;
 
+import com.tecsup.petclinic.entities.Owner;
+import com.tecsup.petclinic.services.OwnerService;
+import com.tecsup.petclinic.util.OwnerTestData;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import com.tecsup.petclinic.services.OwnerService;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 import java.util.Optional;
 
 import static com.tecsup.petclinic.util.OwnerTestData.owner;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -25,7 +28,7 @@ class OwnerControllerMockitoTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private OwnerService service; // El controlador recibe resultados preparados en cada prueba.
+    private OwnerService service;
 
     @Test
     void testFindAllOwners() throws Exception {
@@ -52,5 +55,70 @@ class OwnerControllerMockitoTest {
         when(service.findById(666L)).thenReturn(Optional.empty());
         mockMvc.perform(get("/owners/666"))
                 .andExpect(status().isNotFound());
+    }
+
+    // Integrante B — Creación
+    // Prueba 1: testCreateOwner — POST /owners -> 201 Created y jsonPath de los campos enviados
+    @Test
+    void testCreateOwner() throws Exception {
+        Owner newOwner = OwnerTestData.owner(100L, "Carlos", "Santana", "Av. Principal 123", "Lima", "987654321");
+        when(service.create(any(Owner.class))).thenReturn(newOwner);
+
+        String json = """
+            {
+                "firstName": "Carlos",
+                "lastName": "Santana",
+                "address": "Av. Principal 123",
+                "city": "Lima",
+                "telephone": "987654321"
+            }
+            """;
+
+        mockMvc.perform(post("/owners")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(100))
+                .andExpect(jsonPath("$.firstName").value("Carlos"))
+                .andExpect(jsonPath("$.lastName").value("Santana"))
+                .andExpect(jsonPath("$.address").value("Av. Principal 123"))
+                .andExpect(jsonPath("$.city").value("Lima"))
+                .andExpect(jsonPath("$.telephone").value("987654321"));
+    }
+
+     // Prueba 2: testCreateOwner_BadRequest — cuerpo inválido (sin lastName) -> 400 Bad Request
+    @Test
+    void testCreateOwner_BadRequest() throws Exception {
+        String jsonWithoutLastName = """
+            {
+                "firstName": "Carlos",
+                "address": "Av. Principal 123",
+                "city": "Lima",
+                "telephone": "987654321"
+            }
+            """;
+
+        mockMvc.perform(post("/owners")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonWithoutLastName))
+                .andExpect(status().isBadRequest());
+    }
+
+    // Prueba 3: testFindByLastName — GET /owners?lastName=Davis -> 2 resultados
+    @Test
+    void testFindByLastName() throws Exception {
+        when(service.findByLastName("Davis")).thenReturn(List.of(
+                OwnerTestData.owner(2L, "Betty", "Davis", "638 Cardinal Ave.", "Sun Prairie", "6085551749"),
+                OwnerTestData.owner(4L, "Harold", "Davis", "563 Friendly St.", "Windsor", "6085553198")
+        ));
+
+        mockMvc.perform(get("/owners").param("lastName", "Davis"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].lastName").value("Davis"))
+                .andExpect(jsonPath("$[1].lastName").value("Davis"));
     }
 }

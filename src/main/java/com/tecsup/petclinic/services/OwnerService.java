@@ -15,10 +15,18 @@ public class OwnerService {
     private final OwnerRepository repository;
 
     public List<Owner> findAll() {
-        return repository.findAll(Sort.by("id")); // Mantiene el listado en orden de ID.
+        return repository.findAll(Sort.by("id"));
     }
 
     public Optional<Owner> findById(Long id) {
         return repository.findById(id);
+    }
+
+    public Owner create(Owner owner) {
+        return repository.save(owner);
+    }
+
+    public List<Owner> findByLastName(String lastName) {
+        return repository.findByLastName(lastName);
     }
 }

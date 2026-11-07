@@ -63,7 +63,7 @@ integración real contra H2 en `OwnerControllerTest` y servicio simulado con
 | B · Jesús Rocha | `Lab12-IntegranteB-Rocha` (PR #3) | `testCreateOwner`, `testCreateOwner_BadRequest`, `testFindByLastName` |
 | C · Erick Gamarra | `Lab12-IntegranteC-Gamarra` (PR #1) | `testUpdateOwner`, `testDeleteOwner`, `testDeleteOwnerKO` |
 
-Cada archivo de prueba tiene 9 pruebas. Con las tres ramas integradas en `main`,
+Cada archivo de prueba (`OwnerControllerTest` y `OwnerControllerMockitoTest`) tiene 9 pruebas. Con las tres ramas integradas en `main`,
 `./mvnw clean test -Dspring.profiles.active=h2` ejecuta 45 pruebas sin fallos.
 
 ### Conflictos y reversiones

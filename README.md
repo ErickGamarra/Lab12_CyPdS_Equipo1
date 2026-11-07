@@ -48,3 +48,29 @@ Con Java 21, desde la terminal de IntelliJ en Windows:
 ```powershell
 .\mvnw.cmd test "-Dtest=OwnerControllerTest,OwnerControllerMockitoTest" "-Dspring.profiles.active=h2"
 ```
+
+## Laboratorio 12 · Resumen del equipo
+
+Grupo 1, `OwnerController` (`/owners`). Cada escenario se probó dos veces:
+integración real contra H2 en `OwnerControllerTest` y servicio simulado con
+`@MockitoBean` en `OwnerControllerMockitoTest`.
+
+### Integrantes y pruebas
+
+| Integrante | Rama | Pruebas |
+| --- | --- | --- |
+| A · José Contreras | `Lab12-IntegranteA-Contreras` (PR #2) | `testFindAllOwners`, `testFindOwnerOK`, `testFindOwnerKO` |
+| B · Jesús Rocha | `Lab12-IntegranteB-Rocha` (PR #3) | `testCreateOwner`, `testCreateOwner_BadRequest`, `testFindByLastName` |
+| C · Erick Gamarra | `Lab12-IntegranteC-Gamarra` (PR #1) | `testUpdateOwner`, `testDeleteOwner`, `testDeleteOwnerKO` |
+
+Cada archivo de prueba tiene 9 pruebas. Con las tres ramas integradas en `main`,
+`./mvnw clean test -Dspring.profiles.active=h2` ejecuta 45 pruebas sin fallos.
+
+### Conflictos y reversiones
+
+- La rama C se actualizó con `main` mediante `git merge origin/main` después de
+  fusionar los PR #2 y #3. Git no reportó conflictos de contenido en ese merge.
+- El historial conserva el commit `Revert "Lab12 - Integración de cambios del
+  integrante A - Contreras"` (`6433db0`) y la rama `revert-2-Lab12-IntegranteA-Contreras`,
+  generados al revertir el PR #2 durante la integración. El contenido del bloque A
+  permanece en `main` y sus pruebas pasan.
